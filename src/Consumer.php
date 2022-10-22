@@ -9,6 +9,7 @@
 namespace Pulsar;
 
 
+use Pulsar\Exception\IOException;
 use Pulsar\Exception\OptionsException;
 use Pulsar\Exception\RuntimeException;
 use Pulsar\Proto\CommandMessage;
@@ -97,12 +98,12 @@ class Consumer extends Client
 
 
     /**
-     * @return Message
-     * @throws Exception\IOException
+     * @param bool $loop
+     * @return Message|null
+     * @throws IOException
      * @throws RuntimeException
-     * @throws \Exception
      */
-    public function receive(): Message
+    public function receive(bool $loop = true)
     {
         if (!$this->isHandshake) {
             throw new RuntimeException('not connect to pulsar server');
@@ -125,7 +126,7 @@ class Consumer extends Client
         $this->ping();
 
         if (is_null($response)) {
-            return $this->receive();
+            return $loop ? $this->receive() : null;
         }
 
 
